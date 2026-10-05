@@ -46,13 +46,14 @@ export default function Header() {
         <nav className="desktop-nav">
 
           <NavLink
-            to="/properties"
-            className={({ isActive }) =>
-              `nav-link ${isActive ? 'active' : ''}`
-            }
-          >
-            Buy Property
-          </NavLink>
+			  to="/properties"
+			  end
+			  className={({ isActive }) =>
+				`nav-link ${isActive ? 'active' : ''}`
+			  }
+			>
+			  Buy Property
+			</NavLink>
 
           <NavLink
             to="/properties?listing=rent"
