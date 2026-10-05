@@ -52,7 +52,7 @@ export default function Header() {
 				`nav-link ${isActive ? 'active' : ''}`
 			  }
 			>
-			  Buy Property
+						  Buy Property
 			</NavLink>
 
           <NavLink
