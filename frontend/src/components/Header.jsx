@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
   Heart,
   Plus,
@@ -10,6 +10,30 @@ import {
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const location = useLocation();
+
+  /*
+    =================================================
+    BUY / RENT ACTIVE STATE
+    =================================================
+
+    /properties
+      → Buy Property active
+
+    /properties?listing=rent
+      → Rent active
+  */
+
+  const searchParams = new URLSearchParams(location.search);
+
+  const isRentPage =
+    location.pathname === '/properties' &&
+    searchParams.get('listing') === 'rent';
+
+  const isBuyPage =
+    location.pathname === '/properties' &&
+    !isRentPage;
 
   const closeMobileMenu = () => {
     setMobileOpen(false);
@@ -45,24 +69,27 @@ export default function Header() {
 
         <nav className="desktop-nav">
 
+          {/* BUY PROPERTY */}
+
           <NavLink
-			  to="/properties"
-			  end
-			  className={({ isActive }) =>
-				`nav-link ${isActive ? 'active' : ''}`
-			  }
-			>
-						  Buy Property
-			</NavLink>
+            to="/properties"
+            className={`nav-link ${isBuyPage ? 'active' : ''}`}
+          >
+            Buy Property
+          </NavLink>
+
+
+          {/* RENT */}
 
           <NavLink
             to="/properties?listing=rent"
-            className={({ isActive }) =>
-              `nav-link ${isActive ? 'active' : ''}`
-            }
+            className={`nav-link ${isRentPage ? 'active' : ''}`}
           >
             Rent
           </NavLink>
+
+
+          {/* SELL PROPERTY */}
 
           <NavLink
             to="/post-property"
@@ -82,6 +109,8 @@ export default function Header() {
 
         <div className="header-actions">
 
+          {/* SHORTLIST */}
+
           <Link
             to="/dashboard"
             className="shortlist-link"
@@ -94,6 +123,8 @@ export default function Header() {
           </Link>
 
 
+          {/* POST PROPERTY */}
+
           <Link
             to="/post-property"
             className="post-property-btn"
@@ -105,6 +136,8 @@ export default function Header() {
             </span>
           </Link>
 
+
+          {/* LOGIN */}
 
           <Link
             to="/login"
@@ -149,27 +182,29 @@ export default function Header() {
 
         <div className="mobile-menu">
 
+          {/* BUY PROPERTY */}
+
           <NavLink
             to="/properties"
-            className={({ isActive }) =>
-              `mobile-nav-link ${isActive ? 'active' : ''}`
-            }
+            className={`mobile-nav-link ${isBuyPage ? 'active' : ''}`}
             onClick={closeMobileMenu}
           >
             Buy Property
           </NavLink>
 
 
+          {/* RENT */}
+
           <NavLink
             to="/properties?listing=rent"
-            className={({ isActive }) =>
-              `mobile-nav-link ${isActive ? 'active' : ''}`
-            }
+            className={`mobile-nav-link ${isRentPage ? 'active' : ''}`}
             onClick={closeMobileMenu}
           >
             Rent
           </NavLink>
 
+
+          {/* SELL PROPERTY */}
 
           <NavLink
             to="/post-property"
@@ -182,6 +217,8 @@ export default function Header() {
           </NavLink>
 
 
+          {/* SHORTLIST */}
+
           <Link
             to="/dashboard"
             className="mobile-nav-link"
@@ -192,6 +229,8 @@ export default function Header() {
           </Link>
 
 
+          {/* LOGIN */}
+
           <Link
             to="/login"
             className="mobile-nav-link"
@@ -201,6 +240,8 @@ export default function Header() {
             Login
           </Link>
 
+
+          {/* POST PROPERTY */}
 
           <Link
             to="/post-property"
