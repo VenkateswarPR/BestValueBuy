@@ -14,15 +14,15 @@ export default function Header() {
   const location = useLocation();
 
   /*
-    =================================================
-    BUY / RENT ACTIVE STATE
-    =================================================
+  =================================================
+  BUY / RENT ACTIVE STATE
+  =================================================
 
-    /properties
-      → Buy Property active
+  Buy:
+  /properties
 
-    /properties?listing=rent
-      → Rent active
+  Rent:
+  /properties?listing=rent
   */
 
   const searchParams = new URLSearchParams(location.search);
@@ -71,22 +71,22 @@ export default function Header() {
 
           {/* BUY PROPERTY */}
 
-          <NavLink
+          <Link
             to="/properties"
             className={`nav-link ${isBuyPage ? 'active' : ''}`}
           >
             Buy Property
-          </NavLink>
+          </Link>
 
 
           {/* RENT */}
 
-          <NavLink
+          <Link
             to="/properties?listing=rent"
             className={`nav-link ${isRentPage ? 'active' : ''}`}
           >
             Rent
-          </NavLink>
+          </Link>
 
 
           {/* SELL PROPERTY */}
@@ -184,24 +184,28 @@ export default function Header() {
 
           {/* BUY PROPERTY */}
 
-          <NavLink
+          <Link
             to="/properties"
-            className={`mobile-nav-link ${isBuyPage ? 'active' : ''}`}
+            className={`mobile-nav-link ${
+              isBuyPage ? 'active' : ''
+            }`}
             onClick={closeMobileMenu}
           >
             Buy Property
-          </NavLink>
+          </Link>
 
 
           {/* RENT */}
 
-          <NavLink
+          <Link
             to="/properties?listing=rent"
-            className={`mobile-nav-link ${isRentPage ? 'active' : ''}`}
+            className={`mobile-nav-link ${
+              isRentPage ? 'active' : ''
+            }`}
             onClick={closeMobileMenu}
           >
             Rent
-          </NavLink>
+          </Link>
 
 
           {/* SELL PROPERTY */}
