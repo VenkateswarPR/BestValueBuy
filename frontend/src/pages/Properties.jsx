@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+
 import {
   MapPin,
   Heart,
@@ -15,31 +16,90 @@ import { properties, money } from '../data/properties';
 export default function Properties() {
   const [params] = useSearchParams();
 
+  /*
+  =========================================================
+  URL PARAMETERS
+  =========================================================
+  /properties
+      -> Sale
+
+  /properties?listing=rent
+      -> Rent
+  */
+
+  const listingParam = params.get('listing');
+
+  const listingType =
+    listingParam === 'rent' ? 'Rent' : 'Sale';
+
+  const isRent = listingType === 'Rent';
+
+
+  /*
+  =========================================================
+  INITIAL SEARCH PARAMETERS
+  =========================================================
+  */
+
   const initialType = params.get('type') || 'All';
   const initialLocation = params.get('location') || '';
 
+
+  /*
+  =========================================================
+  FILTER STATE
+  =========================================================
+  */
+
   const [query, setQuery] = useState(initialLocation);
+
   const [type, setType] = useState(initialType);
 
   const [minPrice, setMinPrice] = useState('');
+
   const [maxPrice, setMaxPrice] = useState('');
 
   const [minArea, setMinArea] = useState('');
+
   const [maxArea, setMaxArea] = useState('');
 
   const [bedrooms, setBedrooms] = useState('All');
+
   const [listedBy, setListedBy] = useState('All');
 
   const [sort, setSort] = useState('relevance');
 
   const [mobileFilters, setMobileFilters] = useState(false);
 
+
+  /*
+  =========================================================
+  FILTER PROPERTIES
+  =========================================================
+  */
+
   const filteredProperties = useMemo(() => {
     let result = [...properties];
 
-    /* ---------------------------------------------
-       SEARCH
-    --------------------------------------------- */
+
+    /*
+    ---------------------------------------------------------
+    LISTING PURPOSE
+    ---------------------------------------------------------
+    */
+
+    result = result.filter(
+      (property) =>
+        (property.purpose || 'Sale').toLowerCase() ===
+        listingType.toLowerCase()
+    );
+
+
+    /*
+    ---------------------------------------------------------
+    SEARCH
+    ---------------------------------------------------------
+    */
 
     if (query.trim()) {
       const search = query.toLowerCase().trim();
@@ -49,7 +109,8 @@ export default function Properties() {
           property.title,
           property.location,
           property.type,
-          property.listedBy
+          property.listedBy,
+          property.description
         ]
           .filter(Boolean)
           .join(' ')
@@ -58,9 +119,12 @@ export default function Properties() {
       );
     }
 
-    /* ---------------------------------------------
-       PROPERTY TYPE
-    --------------------------------------------- */
+
+    /*
+    ---------------------------------------------------------
+    PROPERTY TYPE
+    ---------------------------------------------------------
+    */
 
     if (type !== 'All') {
       result = result.filter(
@@ -68,11 +132,12 @@ export default function Properties() {
       );
     }
 
-    /* ---------------------------------------------
-       MIN PRICE
-       Price is stored as rupees.
-       User enters Lakhs.
-    --------------------------------------------- */
+
+    /*
+    ---------------------------------------------------------
+    MIN PRICE
+    ---------------------------------------------------------
+    */
 
     if (minPrice) {
       const minimum = Number(minPrice) * 100000;
@@ -82,9 +147,12 @@ export default function Properties() {
       );
     }
 
-    /* ---------------------------------------------
-       MAX PRICE
-    --------------------------------------------- */
+
+    /*
+    ---------------------------------------------------------
+    MAX PRICE
+    ---------------------------------------------------------
+    */
 
     if (maxPrice) {
       const maximum = Number(maxPrice) * 100000;
@@ -94,9 +162,12 @@ export default function Properties() {
       );
     }
 
-    /* ---------------------------------------------
-       MIN AREA
-    --------------------------------------------- */
+
+    /*
+    ---------------------------------------------------------
+    MIN AREA
+    ---------------------------------------------------------
+    */
 
     if (minArea) {
       result = result.filter(
@@ -105,9 +176,12 @@ export default function Properties() {
       );
     }
 
-    /* ---------------------------------------------
-       MAX AREA
-    --------------------------------------------- */
+
+    /*
+    ---------------------------------------------------------
+    MAX AREA
+    ---------------------------------------------------------
+    */
 
     if (maxArea) {
       result = result.filter(
@@ -116,9 +190,12 @@ export default function Properties() {
       );
     }
 
-    /* ---------------------------------------------
-       BEDROOMS
-    --------------------------------------------- */
+
+    /*
+    ---------------------------------------------------------
+    BEDROOMS
+    ---------------------------------------------------------
+    */
 
     if (bedrooms !== 'All') {
       if (bedrooms === '4+') {
@@ -133,9 +210,12 @@ export default function Properties() {
       }
     }
 
-    /* ---------------------------------------------
-       LISTED BY
-    --------------------------------------------- */
+
+    /*
+    ---------------------------------------------------------
+    LISTED BY
+    ---------------------------------------------------------
+    */
 
     if (listedBy !== 'All') {
       result = result.filter(
@@ -145,9 +225,12 @@ export default function Properties() {
       );
     }
 
-    /* ---------------------------------------------
-       SORT
-    --------------------------------------------- */
+
+    /*
+    ---------------------------------------------------------
+    SORTING
+    ---------------------------------------------------------
+    */
 
     if (sort === 'price-low') {
       result.sort(
@@ -163,17 +246,21 @@ export default function Properties() {
 
     if (sort === 'area-low') {
       result.sort(
-        (a, b) => a.area - b.area
+        (a, b) =>
+          Number(a.area) - Number(b.area)
       );
     }
 
     if (sort === 'area-high') {
       result.sort(
-        (a, b) => b.area - a.area
+        (a, b) =>
+          Number(b.area) - Number(a.area)
       );
     }
 
+
     return result;
+
   }, [
     query,
     type,
@@ -183,12 +270,16 @@ export default function Properties() {
     maxArea,
     bedrooms,
     listedBy,
-    sort
+    sort,
+    listingType
   ]);
 
-  /* ---------------------------------------------
-     CLEAR FILTERS
-  --------------------------------------------- */
+
+  /*
+  =========================================================
+  CLEAR FILTERS
+  =========================================================
+  */
 
   const clearFilters = () => {
     setQuery('');
@@ -202,6 +293,13 @@ export default function Properties() {
     setSort('relevance');
   };
 
+
+  /*
+  =========================================================
+  ACTIVE FILTER CHECK
+  =========================================================
+  */
+
   const hasFilters =
     query ||
     type !== 'All' ||
@@ -212,12 +310,35 @@ export default function Properties() {
     bedrooms !== 'All' ||
     listedBy !== 'All';
 
+
+  /*
+  =========================================================
+  PROPERTY TYPES
+  =========================================================
+  */
+
+  const propertyTypes = [
+    'All',
+    'Land',
+    'Individual House',
+    'Apartment',
+    'Villa'
+  ];
+
+
+  /*
+  =========================================================
+  PAGE
+  =========================================================
+  */
+
   return (
     <main className="properties-page">
 
-      {/* =============================================
+
+      {/* =================================================
           SEARCH HEADER
-      ============================================= */}
+      ================================================= */}
 
       <section className="properties-header">
 
@@ -226,24 +347,35 @@ export default function Properties() {
           <div className="properties-heading">
 
             <div>
+
               <span className="eyebrow">
-                PROPERTY SEARCH
+                {isRent
+                  ? 'RENTAL PROPERTY SEARCH'
+                  : 'PROPERTY SEARCH'}
               </span>
 
+
               <h1>
-                Find your next property
+                {isRent
+                  ? 'Find your next rental'
+                  : 'Find your next property'}
               </h1>
 
+
               <p>
-                Search from properties listed by owners,
-                brokers and builders.
+                {isRent
+                  ? 'Find homes and apartments available for rent from owners, brokers and builders.'
+                  : 'Search from properties listed by owners, brokers and builders.'}
               </p>
+
             </div>
 
           </div>
 
 
-          {/* SEARCH BAR */}
+          {/* =================================================
+              SEARCH BAR
+          ================================================= */}
 
           <div className="property-search">
 
@@ -259,14 +391,18 @@ export default function Properties() {
                 placeholder="Search city, locality or landmark"
               />
 
+
               {query && (
+
                 <button
                   type="button"
                   onClick={() => setQuery('')}
                   className="clear-search"
+                  aria-label="Clear search"
                 >
                   <X size={16} />
                 </button>
+
               )}
 
             </div>
@@ -277,7 +413,9 @@ export default function Properties() {
               onChange={(event) =>
                 setType(event.target.value)
               }
+              aria-label="Property type"
             >
+
               <option value="All">
                 All Property Types
               </option>
@@ -297,6 +435,7 @@ export default function Properties() {
               <option value="Villa">
                 Villa
               </option>
+
             </select>
 
 
@@ -315,13 +454,16 @@ export default function Properties() {
       </section>
 
 
-      {/* =============================================
+      {/* =================================================
           MAIN CONTENT
-      ============================================= */}
+      ================================================= */}
 
       <section className="wrap properties-content">
 
-        {/* MOBILE FILTER BUTTON */}
+
+        {/* =================================================
+            MOBILE FILTER BUTTON
+        ================================================= */}
 
         <button
           type="button"
@@ -337,9 +479,10 @@ export default function Properties() {
 
         <div className="properties-layout">
 
-          {/* =========================================
+
+          {/* =================================================
               FILTER PANEL
-          ========================================= */}
+          ================================================= */}
 
           <aside
             className={`filter-panel ${
@@ -352,12 +495,17 @@ export default function Properties() {
             <div className="filter-header">
 
               <div>
-                <h3>Filters</h3>
+
+                <h3>
+                  Filters
+                </h3>
 
                 <span>
                   Refine your search
                 </span>
+
               </div>
+
 
               <button
                 type="button"
@@ -365,6 +513,7 @@ export default function Properties() {
                 onClick={() =>
                   setMobileFilters(false)
                 }
+                aria-label="Close filters"
               >
                 <X size={20} />
               </button>
@@ -372,17 +521,13 @@ export default function Properties() {
             </div>
 
 
-            {/* PROPERTY TYPE */}
+            {/* =================================================
+                PROPERTY TYPE
+            ================================================= */}
 
             <FilterSection title="Property Type">
 
-              {[
-                'All',
-                'Land',
-                'Individual House',
-                'Apartment',
-                'Villa'
-              ].map((propertyType) => (
+              {propertyTypes.map((propertyType) => (
 
                 <button
                   key={propertyType}
@@ -398,9 +543,11 @@ export default function Properties() {
                 >
 
                   <span className="filter-radio">
+
                     {type === propertyType && (
                       <span />
                     )}
+
                   </span>
 
                   {propertyType}
@@ -412,15 +559,25 @@ export default function Properties() {
             </FilterSection>
 
 
-            {/* PRICE */}
+            {/* =================================================
+                PRICE
+            ================================================= */}
 
-            <FilterSection title="Price Range">
+            <FilterSection
+              title={
+                isRent
+                  ? 'Monthly Rent'
+                  : 'Price Range'
+              }
+            >
 
               <div className="filter-input-row">
 
                 <div className="filter-input-wrap">
 
-                  <span>₹</span>
+                  <span>
+                    ₹
+                  </span>
 
                   <input
                     type="number"
@@ -442,7 +599,9 @@ export default function Properties() {
 
                 <div className="filter-input-wrap">
 
-                  <span>₹</span>
+                  <span>
+                    ₹
+                  </span>
 
                   <input
                     type="number"
@@ -458,50 +617,65 @@ export default function Properties() {
 
               </div>
 
+
               <small className="filter-help">
-                Enter amount in lakhs
+
+                {isRent
+                  ? 'Enter monthly rent'
+                  : 'Enter amount in lakhs'}
+
               </small>
 
             </FilterSection>
 
 
-            {/* BEDROOMS */}
+            {/* =================================================
+                BEDROOMS
+            ================================================= */}
 
             <FilterSection title="Bedrooms">
 
               <div className="bedroom-options">
 
-                {['All', '1', '2', '3', '4+'].map(
-                  (bedroom) => (
+                {[
+                  'All',
+                  '1',
+                  '2',
+                  '3',
+                  '4+'
+                ].map((bedroom) => (
 
-                    <button
-                      key={bedroom}
-                      type="button"
-                      className={
-                        bedrooms === bedroom
-                          ? 'bedroom-btn active'
-                          : 'bedroom-btn'
-                      }
-                      onClick={() =>
-                        setBedrooms(bedroom)
-                      }
-                    >
-                      {bedroom === 'All'
-                        ? 'Any'
-                        : bedroom === '4+'
+                  <button
+                    key={bedroom}
+                    type="button"
+                    className={
+                      bedrooms === bedroom
+                        ? 'bedroom-btn active'
+                        : 'bedroom-btn'
+                    }
+                    onClick={() =>
+                      setBedrooms(bedroom)
+                    }
+                  >
+
+                    {bedroom === 'All'
+                      ? 'Any'
+                      : bedroom === '4+'
                         ? '4+'
                         : `${bedroom} BHK`}
-                    </button>
 
-                  )
-                )}
+                  </button>
+
+                ))}
 
               </div>
 
             </FilterSection>
 
 
-            {/* AREA */}
+            {/* =================================================
+                AREA
+            ================================================= */}
 
             <FilterSection title="Property Area">
 
@@ -519,7 +693,9 @@ export default function Properties() {
                     placeholder="Min"
                   />
 
-                  <span>sq.ft</span>
+                  <span>
+                    sq.ft
+                  </span>
 
                 </div>
 
@@ -541,7 +717,9 @@ export default function Properties() {
                     placeholder="Max"
                   />
 
-                  <span>sq.ft</span>
+                  <span>
+                    sq.ft
+                  </span>
 
                 </div>
 
@@ -550,7 +728,9 @@ export default function Properties() {
             </FilterSection>
 
 
-            {/* LISTED BY */}
+            {/* =================================================
+                LISTED BY
+            ================================================= */}
 
             <FilterSection title="Listed By">
 
@@ -575,9 +755,11 @@ export default function Properties() {
                 >
 
                   <span className="filter-radio">
+
                     {listedBy === person && (
                       <span />
                     )}
+
                   </span>
 
                   {person === 'All'
@@ -591,7 +773,9 @@ export default function Properties() {
             </FilterSection>
 
 
-            {/* CLEAR */}
+            {/* =================================================
+                CLEAR FILTERS
+            ================================================= */}
 
             {hasFilters && (
 
@@ -609,38 +793,59 @@ export default function Properties() {
           </aside>
 
 
-          {/* =========================================
+          {/* =================================================
               RESULTS
-          ========================================= */}
+          ================================================= */}
 
           <div className="property-results">
+
+
+            {/* =================================================
+                RESULTS HEADER
+            ================================================= */}
 
             <div className="results-header">
 
               <div>
 
                 <h2>
+
                   {filteredProperties.length}{' '}
+
                   {filteredProperties.length === 1
-                    ? 'Property'
-                    : 'Properties'}{' '}
-                  Found
+                    ? isRent
+                      ? 'Rental Property'
+                      : 'Property'
+                    : isRent
+                      ? 'Rental Properties'
+                      : 'Properties'}
+
+                  {' '}Found
+
                 </h2>
 
+
                 <p>
+
                   {hasFilters
                     ? 'Matching your selected filters'
-                    : 'Showing all available properties'}
+                    : isRent
+                      ? 'Showing all available rental properties'
+                      : 'Showing all properties available for sale'}
+
                 </p>
 
               </div>
 
+
+              {/* SORT */}
 
               <div className="sort-control">
 
                 <label htmlFor="sort">
                   Sort by
                 </label>
+
 
                 <div className="sort-select">
 
@@ -651,6 +856,7 @@ export default function Properties() {
                       setSort(event.target.value)
                     }
                   >
+
                     <option value="relevance">
                       Relevance
                     </option>
@@ -670,6 +876,7 @@ export default function Properties() {
                     <option value="area-high">
                       Area: High to Low
                     </option>
+
                   </select>
 
                   <ChevronDown size={16} />
@@ -681,64 +888,115 @@ export default function Properties() {
             </div>
 
 
-            {/* ACTIVE FILTERS */}
+            {/* =================================================
+                ACTIVE FILTERS
+            ================================================= */}
 
             {hasFilters && (
 
               <div className="active-filters">
 
                 {type !== 'All' && (
+
                   <FilterChip
                     label={type}
                     onRemove={() =>
                       setType('All')
                     }
                   />
+
                 )}
 
+
                 {query && (
+
                   <FilterChip
                     label={`Search: ${query}`}
                     onRemove={() =>
                       setQuery('')
                     }
                   />
+
                 )}
 
+
                 {minPrice && (
+
                   <FilterChip
-                    label={`Min ₹${minPrice}L`}
+                    label={
+                      isRent
+                        ? `Min ₹${minPrice}`
+                        : `Min ₹${minPrice}L`
+                    }
                     onRemove={() =>
                       setMinPrice('')
                     }
                   />
+
                 )}
 
+
                 {maxPrice && (
+
                   <FilterChip
-                    label={`Max ₹${maxPrice}L`}
+                    label={
+                      isRent
+                        ? `Max ₹${maxPrice}`
+                        : `Max ₹${maxPrice}L`
+                    }
                     onRemove={() =>
                       setMaxPrice('')
                     }
                   />
+
                 )}
 
+
+                {minArea && (
+
+                  <FilterChip
+                    label={`Min ${minArea} sq.ft`}
+                    onRemove={() =>
+                      setMinArea('')
+                    }
+                  />
+
+                )}
+
+
+                {maxArea && (
+
+                  <FilterChip
+                    label={`Max ${maxArea} sq.ft`}
+                    onRemove={() =>
+                      setMaxArea('')
+                    }
+                  />
+
+                )}
+
+
                 {bedrooms !== 'All' && (
+
                   <FilterChip
                     label={`${bedrooms} BHK`}
                     onRemove={() =>
                       setBedrooms('All')
                     }
                   />
+
                 )}
 
+
                 {listedBy !== 'All' && (
+
                   <FilterChip
                     label={listedBy}
                     onRemove={() =>
                       setListedBy('All')
                     }
                   />
+
                 )}
 
               </div>
@@ -746,7 +1004,9 @@ export default function Properties() {
             )}
 
 
-            {/* PROPERTY RESULTS */}
+            {/* =================================================
+                PROPERTY RESULTS
+            ================================================= */}
 
             {filteredProperties.length > 0 ? (
 
@@ -754,10 +1014,13 @@ export default function Properties() {
 
                 {filteredProperties.map(
                   (property) => (
+
                     <PropertyCard
                       key={property.id}
                       property={property}
+                      isRent={isRent}
                     />
+
                   )
                 )}
 
@@ -771,14 +1034,17 @@ export default function Properties() {
                   <Search size={28} />
                 </div>
 
+
                 <h3>
                   No properties found
                 </h3>
+
 
                 <p>
                   We couldn't find properties
                   matching your current filters.
                 </p>
+
 
                 <button
                   type="button"
@@ -804,10 +1070,14 @@ export default function Properties() {
 
 /* =========================================================
    FILTER SECTION
-   ========================================================= */
+========================================================= */
 
-function FilterSection({ title, children }) {
+function FilterSection({
+  title,
+  children
+}) {
   return (
+
     <div className="filter-section">
 
       <h4>
@@ -817,33 +1087,45 @@ function FilterSection({ title, children }) {
       {children}
 
     </div>
+
   );
 }
 
 
 /* =========================================================
    FILTER CHIP
-   ========================================================= */
+========================================================= */
 
-function FilterChip({ label, onRemove }) {
+function FilterChip({
+  label,
+  onRemove
+}) {
   return (
+
     <button
       type="button"
       className="filter-chip"
       onClick={onRemove}
     >
+
       {label}
+
       <X size={14} />
+
     </button>
+
   );
 }
 
 
 /* =========================================================
    PROPERTY CARD
-   ========================================================= */
+========================================================= */
 
-function PropertyCard({ property }) {
+function PropertyCard({
+  property,
+  isRent
+}) {
 
   return (
 
@@ -852,7 +1134,10 @@ function PropertyCard({ property }) {
       className="search-property-card"
     >
 
-      {/* IMAGE */}
+
+      {/* =================================================
+          IMAGE
+      ================================================= */}
 
       <div className="search-card-image">
 
@@ -861,10 +1146,19 @@ function PropertyCard({ property }) {
           alt={property.title}
         />
 
+
+        {/* SALE / RENT TAG */}
+
         <span className="search-sale-tag">
-          For Sale
+
+          {isRent
+            ? 'FOR RENT'
+            : 'FOR SALE'}
+
         </span>
 
+
+        {/* FAVORITE */}
 
         <button
           type="button"
@@ -880,18 +1174,36 @@ function PropertyCard({ property }) {
       </div>
 
 
-      {/* CONTENT */}
+      {/* =================================================
+          CONTENT
+      ================================================= */}
 
       <div className="search-card-content">
 
+
+        {/* PRICE */}
+
         <div className="search-card-price">
+
           {money(property.price)}
+
+          {isRent && (
+            <span className="rent-price-period">
+              {' '}/ month
+            </span>
+          )}
+
         </div>
+
+
+        {/* TITLE */}
 
         <h3>
           {property.title}
         </h3>
 
+
+        {/* LOCATION */}
 
         <p className="search-location">
 
@@ -902,6 +1214,8 @@ function PropertyCard({ property }) {
         </p>
 
 
+        {/* SPECS */}
+
         <div className="search-card-specs">
 
           <span>
@@ -909,20 +1223,28 @@ function PropertyCard({ property }) {
             {' '}sq.ft
           </span>
 
+
           {property.beds > 0 && (
+
             <span>
               {property.beds} Beds
             </span>
+
           )}
 
+
           {property.baths > 0 && (
+
             <span>
               {property.baths} Baths
             </span>
+
           )}
 
         </div>
 
+
+        {/* FOOTER */}
 
         <div className="search-card-footer">
 
@@ -930,7 +1252,9 @@ function PropertyCard({ property }) {
             {property.listedBy}
           </span>
 
+
           {property.verified && (
+
             <span className="verified-badge">
 
               <ShieldCheck size={14} />
@@ -938,6 +1262,7 @@ function PropertyCard({ property }) {
               Verified
 
             </span>
+
           )}
 
         </div>
@@ -945,5 +1270,6 @@ function PropertyCard({ property }) {
       </div>
 
     </Link>
+
   );
 }
