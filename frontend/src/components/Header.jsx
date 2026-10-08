@@ -1,48 +1,67 @@
 import React, { useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import {
+  Link,
+  useLocation
+} from 'react-router-dom';
+
 import {
   Heart,
   Plus,
   UserRound,
   Menu,
-  X
+  X,
+  Building2
 } from 'lucide-react';
 
+
 export default function Header() {
-  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const location = useLocation();
+  const [mobileOpen, setMobileOpen] =
+    useState(false);
 
-  /*
-  =================================================
-  BUY / RENT ACTIVE STATE
-  =================================================
+  const location =
+    useLocation();
 
-  Buy:
-  /properties
 
-  Rent:
-  /properties?listing=rent
-  */
+  /* =================================================
+     BUY / RENT ACTIVE STATE
+  ================================================= */
 
-  const searchParams = new URLSearchParams(location.search);
+  const searchParams =
+    new URLSearchParams(
+      location.search
+    );
+
 
   const isRentPage =
     location.pathname === '/properties' &&
     searchParams.get('listing') === 'rent';
 
+
   const isBuyPage =
     location.pathname === '/properties' &&
     !isRentPage;
+
+
+  const isDashboardPage =
+    location.pathname === '/dashboard';
+
+
+  const isShortlistPage =
+    location.pathname === '/shortlist';
+
 
   const closeMobileMenu = () => {
     setMobileOpen(false);
   };
 
+
   return (
+
     <header className="header">
 
       <div className="header-wrap">
+
 
         {/* =================================================
             LOGO
@@ -53,6 +72,7 @@ export default function Header() {
           className="brand"
           onClick={closeMobileMenu}
         >
+
           <span className="brand-mark">
             BV
           </span>
@@ -60,6 +80,7 @@ export default function Header() {
           <span className="brand-name">
             Best<span>Value</span>Buy
           </span>
+
         </Link>
 
 
@@ -69,11 +90,18 @@ export default function Header() {
 
         <nav className="desktop-nav">
 
+
           {/* BUY PROPERTY */}
 
           <Link
             to="/properties"
-            className={`nav-link ${isBuyPage ? 'active' : ''}`}
+            className={
+              `nav-link ${
+                isBuyPage
+                  ? 'active'
+                  : ''
+              }`
+            }
           >
             Buy Property
           </Link>
@@ -83,23 +111,19 @@ export default function Header() {
 
           <Link
             to="/properties?listing=rent"
-            className={`nav-link ${isRentPage ? 'active' : ''}`}
+            className={
+              `nav-link ${
+                isRentPage
+                  ? 'active'
+                  : ''
+              }`
+            }
           >
             Rent
           </Link>
 
 
-          {/* SELL PROPERTY */}
-
-          <NavLink
-            to="/post-property"
-            className={({ isActive }) =>
-              `nav-link ${isActive ? 'active' : ''}`
-            }
-          >
-            Sell Property
-          </NavLink>
-
+         
         </nav>
 
 
@@ -109,17 +133,48 @@ export default function Header() {
 
         <div className="header-actions">
 
+
           {/* SHORTLIST */}
 
           <Link
-            to="/dashboard"
-            className="shortlist-link"
+            to="/shortlist"
+            className={
+              `shortlist-link ${
+                isShortlistPage
+                  ? 'active'
+                  : ''
+              }`
+            }
           >
+
             <Heart size={19} />
 
             <span>
               Shortlist
             </span>
+
+          </Link>
+
+
+          {/* MY PROPERTIES */}
+
+          <Link
+            to="/dashboard"
+            className={
+              `my-properties-link ${
+                isDashboardPage
+                  ? 'active'
+                  : ''
+              }`
+            }
+          >
+
+            <Building2 size={18} />
+
+            <span>
+              My Properties
+            </span>
+
           </Link>
 
 
@@ -129,11 +184,13 @@ export default function Header() {
             to="/post-property"
             className="post-property-btn"
           >
+
             <Plus size={18} />
 
             <span>
               Post Property
             </span>
+
           </Link>
 
 
@@ -143,11 +200,13 @@ export default function Header() {
             to="/login"
             className="login-link"
           >
+
             <UserRound size={18} />
 
             <span>
               Login
             </span>
+
           </Link>
 
         </div>
@@ -160,15 +219,27 @@ export default function Header() {
         <button
           type="button"
           className="mobile-menu-btn"
-          onClick={() => setMobileOpen(!mobileOpen)}
+          onClick={() =>
+            setMobileOpen(
+              !mobileOpen
+            )
+          }
           aria-label="Toggle navigation"
-          aria-expanded={mobileOpen}
+          aria-expanded={
+            mobileOpen
+          }
         >
+
           {mobileOpen ? (
+
             <X size={23} />
+
           ) : (
+
             <Menu size={23} />
+
           )}
+
         </button>
 
       </div>
@@ -182,14 +253,21 @@ export default function Header() {
 
         <div className="mobile-menu">
 
+
           {/* BUY PROPERTY */}
 
           <Link
             to="/properties"
-            className={`mobile-nav-link ${
-              isBuyPage ? 'active' : ''
-            }`}
-            onClick={closeMobileMenu}
+            className={
+              `mobile-nav-link ${
+                isBuyPage
+                  ? 'active'
+                  : ''
+              }`
+            }
+            onClick={
+              closeMobileMenu
+            }
           >
             Buy Property
           </Link>
@@ -199,37 +277,67 @@ export default function Header() {
 
           <Link
             to="/properties?listing=rent"
-            className={`mobile-nav-link ${
-              isRentPage ? 'active' : ''
-            }`}
-            onClick={closeMobileMenu}
+            className={
+              `mobile-nav-link ${
+                isRentPage
+                  ? 'active'
+                  : ''
+              }`
+            }
+            onClick={
+              closeMobileMenu
+            }
           >
             Rent
           </Link>
 
 
-          {/* SELL PROPERTY */}
-
-          <NavLink
-            to="/post-property"
-            className={({ isActive }) =>
-              `mobile-nav-link ${isActive ? 'active' : ''}`
-            }
-            onClick={closeMobileMenu}
-          >
-            Sell Property
-          </NavLink>
+          
 
 
           {/* SHORTLIST */}
 
           <Link
-            to="/dashboard"
-            className="mobile-nav-link"
-            onClick={closeMobileMenu}
+            to="/shortlist"
+            className={
+              `mobile-nav-link ${
+                isShortlistPage
+                  ? 'active'
+                  : ''
+              }`
+            }
+            onClick={
+              closeMobileMenu
+            }
           >
+
             <Heart size={18} />
+
             Shortlist
+
+          </Link>
+
+
+          {/* MY PROPERTIES */}
+
+          <Link
+            to="/dashboard"
+            className={
+              `mobile-nav-link ${
+                isDashboardPage
+                  ? 'active'
+                  : ''
+              }`
+            }
+            onClick={
+              closeMobileMenu
+            }
+          >
+
+            <Building2 size={18} />
+
+            My Properties
+
           </Link>
 
 
@@ -238,10 +346,15 @@ export default function Header() {
           <Link
             to="/login"
             className="mobile-nav-link"
-            onClick={closeMobileMenu}
+            onClick={
+              closeMobileMenu
+            }
           >
+
             <UserRound size={18} />
+
             Login
+
           </Link>
 
 
@@ -250,10 +363,15 @@ export default function Header() {
           <Link
             to="/post-property"
             className="mobile-post-btn"
-            onClick={closeMobileMenu}
+            onClick={
+              closeMobileMenu
+            }
           >
+
             <Plus size={18} />
+
             Post Property
+
           </Link>
 
         </div>
@@ -261,5 +379,6 @@ export default function Header() {
       )}
 
     </header>
+
   );
 }
