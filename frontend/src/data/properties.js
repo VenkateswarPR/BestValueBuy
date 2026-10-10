@@ -1,14 +1,5 @@
-const propertyImages = [
-  '/BestValueBuy/property-images/property-exterior.jpg',
-  '/BestValueBuy/property-images/living-room.jpg',
-  '/BestValueBuy/property-images/kitchen.jpg',
-  '/BestValueBuy/property-images/bedroom.jpg',
-  '/BestValueBuy/property-images/bathroom.jpg',
-  '/BestValueBuy/property-images/balcony.jpg'
-];
 
-export const properties = [
-
+const properties = [
   // =====================================================
   // SALE PROPERTIES
   // =====================================================
@@ -21,18 +12,23 @@ export const properties = [
     price: 6800000,
     location: 'Anna Nagar, Chennai',
     area: 1150,
+    builtUpArea: 1150,
+    plotArea: 0,
+    udsValue: 450,
+    apartmentName: 'Premium Residential Apartments',
     beds: 2,
     baths: 2,
+    propertyAge: '1–5 years',
+    facing: 'East',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Premium 2 BHK apartment located in Anna Nagar with excellent connectivity and modern amenities.',
+      'Premium 2 BHK apartment in Anna Nagar with excellent connectivity and modern amenities.',
   },
 
   {
@@ -43,18 +39,22 @@ export const properties = [
     price: 9250000,
     location: 'Poonamallee, Chennai',
     area: 1850,
+    builtUpArea: 1850,
+    plotArea: 2400,
+    udsValue: 0,
     beds: 3,
     baths: 3,
+    propertyAge: '1–5 years',
+    facing: 'North',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Spacious 3 BHK villa with excellent living space, parking and peaceful surroundings.',
+      'Spacious 3 BHK villa with generous living space, parking and peaceful surroundings.',
   },
 
   {
@@ -65,18 +65,22 @@ export const properties = [
     price: 3500000,
     location: 'Poonamallee, Chennai',
     area: 1200,
+    builtUpArea: 0,
+    plotArea: 1200,
+    udsValue: 0,
     beds: 0,
     baths: 0,
+    propertyAge: '',
+    facing: 'East',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'CMDA approved residential plot suitable for constructing an independent house.',
+      'Sample residential plot listing. Approval status must be verified before publication.',
   },
 
   {
@@ -87,18 +91,22 @@ export const properties = [
     price: 7900000,
     location: 'Avadi, Chennai',
     area: 1650,
+    builtUpArea: 1650,
+    plotArea: 1800,
+    udsValue: 0,
     beds: 3,
     baths: 3,
+    propertyAge: '5–10 years',
+    facing: 'South',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Modern 3 BHK individual house with spacious rooms, parking and convenient access to major roads.',
+      'Sample individual house listing with spacious rooms, parking and convenient road access.',
   },
 
   {
@@ -109,18 +117,23 @@ export const properties = [
     price: 5400000,
     location: 'Mogappair, Chennai',
     area: 1050,
+    builtUpArea: 1050,
+    plotArea: 0,
+    udsValue: 400,
+    apartmentName: 'Mogappair Residential Apartments',
     beds: 2,
     baths: 2,
+    propertyAge: '1–5 years',
+    facing: 'West',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Ready-to-move 2 BHK apartment in a well-connected residential neighbourhood.',
+      'Sample 2 BHK apartment listing in a well-connected residential neighbourhood.',
   },
 
   {
@@ -131,18 +144,22 @@ export const properties = [
     price: 12000000,
     location: 'OMR, Chennai',
     area: 2400,
+    builtUpArea: 0,
+    plotArea: 2400,
+    udsValue: 0,
     beds: 0,
     baths: 0,
+    propertyAge: '',
+    facing: 'North',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Commercial land with excellent main-road visibility and strong development potential.',
+      'Sample commercial land listing. Zoning, permitted use and approvals require verification.',
   },
 
   // =====================================================
@@ -157,18 +174,23 @@ export const properties = [
     price: 28000,
     location: 'Anna Nagar, Chennai',
     area: 1150,
+    builtUpArea: 1150,
+    plotArea: 0,
+    udsValue: 450,
+    apartmentName: 'Anna Nagar Residential Apartments',
     beds: 2,
     baths: 2,
+    propertyAge: '1–5 years',
+    facing: 'East',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Fully furnished 2 BHK apartment available for rent in Anna Nagar.',
+      'Sample furnished 2 BHK apartment available for monthly rent in Anna Nagar.',
   },
 
   {
@@ -179,18 +201,22 @@ export const properties = [
     price: 45000,
     location: 'Poonamallee, Chennai',
     area: 1850,
+    builtUpArea: 1850,
+    plotArea: 2400,
+    udsValue: 0,
     beds: 3,
     baths: 3,
+    propertyAge: '1–5 years',
+    facing: 'North',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Spacious 3 BHK villa suitable for families, with parking and a peaceful residential environment.',
+      'Sample family villa rental with parking and a peaceful residential environment.',
   },
 
   {
@@ -201,18 +227,23 @@ export const properties = [
     price: 22000,
     location: 'Porur, Chennai',
     area: 1080,
+    builtUpArea: 1080,
+    plotArea: 0,
+    udsValue: 420,
+    apartmentName: 'Porur Residential Apartments',
     beds: 2,
     baths: 2,
+    propertyAge: '5–10 years',
+    facing: 'South',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Modern 2 BHK apartment in Porur with good connectivity to IT parks and major roads.',
+      'Sample apartment rental in Porur with access to major roads and nearby employment centres.',
   },
 
   {
@@ -223,18 +254,22 @@ export const properties = [
     price: 32000,
     location: 'Avadi, Chennai',
     area: 1650,
+    builtUpArea: 1650,
+    plotArea: 1800,
+    udsValue: 0,
     beds: 3,
     baths: 3,
+    propertyAge: '5–10 years',
+    facing: 'South',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Independent 3 BHK house available for rent with parking and spacious interiors.',
+      'Sample independent house rental with parking and spacious interiors.',
   },
 
   {
@@ -245,18 +280,23 @@ export const properties = [
     price: 16000,
     location: 'Mogappair, Chennai',
     area: 650,
+    builtUpArea: 650,
+    plotArea: 0,
+    udsValue: 250,
+    apartmentName: 'Mogappair Residential Apartments',
     beds: 1,
     baths: 1,
+    propertyAge: '5–10 years',
+    facing: 'West',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Compact and comfortable 1 BHK apartment suitable for working professionals or couples.',
+      'Sample compact 1 BHK apartment rental suitable for working professionals or couples.',
   },
 
   {
@@ -267,20 +307,27 @@ export const properties = [
     price: 38000,
     location: 'OMR, Chennai',
     area: 1550,
+    builtUpArea: 1550,
+    plotArea: 0,
+    udsValue: 500,
+    apartmentName: 'OMR Residential Apartments',
     beds: 3,
     baths: 3,
+    propertyAge: '1–5 years',
+    facing: 'East',
     listedBy: 'Owner',
     verified: true,
-
     image:
       'https://images.unsplash.com/photo-1600607688960-e095ff83135c?auto=format&fit=crop&w=1000&q=80',
-
-    images: propertyImages,
-
+    images: [
+      'https://images.unsplash.com/photo-1600607688960-e095ff83135c?auto=format&fit=crop&w=1000&q=80',
+    ],
     description:
-      'Premium 3 BHK apartment on OMR with modern interiors and excellent access to IT corridors.',
-  }
+      'Sample premium 3 BHK apartment rental with modern interiors and access to the OMR corridor.',
+  },
 ];
+
+export { properties };
 
 export const money = (number) =>
   `₹${new Intl.NumberFormat('en-IN').format(number)}`;
