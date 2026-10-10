@@ -1,384 +1,139 @@
-import React, { useState } from 'react';
-import {
-  Link,
-  useLocation
-} from 'react-router-dom';
-
-import {
-  Heart,
-  Plus,
-  UserRound,
-  Menu,
-  X,
-  Building2
-} from 'lucide-react';
-
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Heart, Plus, UserRound, LogOut, Menu, X, ChevronDown, House, CircleUserRound } from 'lucide-react';
+import { getCurrentUser, logoutDemoUser } from '../utils/demoAuth';
 
 export default function Header() {
+  const [user, setUser] = useState(() => getCurrentUser());
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const [mobileOpen, setMobileOpen] =
-    useState(false);
+  useEffect(() => {
+    const refreshUser = () => setUser(getCurrentUser());
+    window.addEventListener('bvb-auth-change', refreshUser);
+    window.addEventListener('storage', refreshUser);
+    return () => {
+      window.removeEventListener('bvb-auth-change', refreshUser);
+      window.removeEventListener('storage', refreshUser);
+    };
+  }, []);
 
-  const location =
-    useLocation();
-
-
-  /* =================================================
-     BUY / RENT ACTIVE STATE
-  ================================================= */
-
-  const searchParams =
-    new URLSearchParams(
-      location.search
-    );
-
-
-  const isRentPage =
-    location.pathname === '/properties' &&
-    searchParams.get('listing') === 'rent';
-
-
-  const isBuyPage =
-    location.pathname === '/properties' &&
-    !isRentPage;
-
-
-  const isDashboardPage =
-    location.pathname === '/dashboard';
-
-
-  const isShortlistPage =
-    location.pathname === '/shortlist';
-
-
-  const closeMobileMenu = () => {
+  useEffect(() => {
     setMobileOpen(false);
+    setAccountOpen(false);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const closeOnOutsideClick = (event) => {
+      if (accountRef.current && !accountRef.current.contains(event.target)) setAccountOpen(false);
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setAccountOpen(false);
+    };
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('mousedown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    logoutDemoUser();
+    setUser(null);
+    setAccountOpen(false);
+    setMobileOpen(false);
+    navigate('/', { replace: true });
   };
 
+  const linkClass = ({ isActive }) => `nav-link${isActive ? ' active' : ''}`;
+  const displayName = user?.name || user?.email?.split('@')[0] || 'User';
 
   return (
-
     <header className="header">
-
       <div className="header-wrap">
-
-
-        {/* =================================================
-            LOGO
-        ================================================= */}
-
-        <Link
-          to="/"
-          className="brand"
-          onClick={closeMobileMenu}
-        >
-
-          <span className="brand-mark">
-            BV
-          </span>
-
-          <span className="brand-name">
-            Best<span>Value</span>Buy
-          </span>
-
+        <Link to="/" className="brand" aria-label="BestValueBuy home">
+          <span className="brand-mark">BVB</span>
+          <span className="brand-name">BestValue<span>Buy</span></span>
         </Link>
 
-
-        {/* =================================================
-            DESKTOP NAVIGATION
-        ================================================= */}
-
-        <nav className="desktop-nav">
-
-
-          {/* BUY PROPERTY */}
-
-          <Link
-            to="/properties"
-            className={
-              `nav-link ${
-                isBuyPage
-                  ? 'active'
-                  : ''
-              }`
-            }
-          >
-            Buy Property
-          </Link>
-
-
-          {/* RENT */}
-
-          <Link
-            to="/properties?listing=rent"
-            className={
-              `nav-link ${
-                isRentPage
-                  ? 'active'
-                  : ''
-              }`
-            }
-          >
-            Rent
-          </Link>
-
-
-         
+        <nav className={`desktop-nav${mobileOpen ? ' mobile-nav-open' : ''}`} aria-label="Main navigation">
+          <NavLink to="/" end className={linkClass}>Home</NavLink>
+          <NavLink to="/properties" className={linkClass}>Buy</NavLink>
+          <NavLink to="/properties?listing=rent" className={linkClass}>Rent</NavLink>
         </nav>
 
-
-        {/* =================================================
-            DESKTOP ACTIONS
-        ================================================= */}
-
         <div className="header-actions">
-
-
-          {/* SHORTLIST */}
-
-          <Link
-            to="/shortlist"
-            className={
-              `shortlist-link ${
-                isShortlistPage
-                  ? 'active'
-                  : ''
-              }`
-            }
-          >
-
-            <Heart size={19} />
-
-            <span>
-              Shortlist
-            </span>
-
+          <Link to={user ? '/post-property' : '/login'} className="post-property-btn">
+            <Plus size={17} /> Post Property
           </Link>
 
+          {user ? (
+            <div className="header-account" ref={accountRef}>
+              <button
+                type="button"
+                className={`header-account-trigger${accountOpen ? ' is-open' : ''}`}
+                aria-expanded={accountOpen}
+                aria-haspopup="menu"
+                onClick={() => setAccountOpen(value => !value)}
+                title="Open account menu"
+              >
+                <UserRound size={16} />
+                <span className="header-account-name">{displayName}</span>
+                <ChevronDown size={14} className="header-account-chevron" />
+              </button>
 
-          {/* MY PROPERTIES */}
+              {accountOpen && (
+                <div className="account-dropdown" role="menu">
+                  <div className="account-dropdown-profile">
+                    <span className="account-avatar"><UserRound size={20} /></span>
+                    <span className="account-profile-text">
+                      <strong>{displayName}</strong>
+                      <small>{user.email}</small>
+                    </span>
+                  </div>
+                  <div className="account-dropdown-divider" />
+                  <div className="account-details" aria-label="Account details">
+                    <span className="account-section-label">ACCOUNT DETAILS</span>
+                    <span><strong>Name</strong><span>{displayName}</span></span>
+                    <span><strong>Email</strong><span>{user.email || 'Not provided'}</span></span>
+                  </div>
+                  <div className="account-dropdown-divider" />
+                  <Link to="/dashboard" role="menuitem" className="account-dropdown-link">
+                    <House size={17} /><span>My Properties</span>
+                  </Link>
+                  <Link to="/shortlist" role="menuitem" className="account-dropdown-link">
+                    <Heart size={17} /><span>Shortlisted Properties</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/login" className="login-link">
+              <UserRound size={17} /> <span>Login</span>
+            </Link>
+          )}
 
-          <Link
-            to="/dashboard"
-            className={
-              `my-properties-link ${
-                isDashboardPage
-                  ? 'active'
-                  : ''
-              }`
-            }
-          >
-
-            <Building2 size={18} />
-
-            <span>
-              My Properties
-            </span>
-
-          </Link>
-
-
-          {/* POST PROPERTY */}
-
-          <Link
-            to="/post-property"
-            className="post-property-btn"
-          >
-
-            <Plus size={18} />
-
-            <span>
-              Post Property
-            </span>
-
-          </Link>
-
-
-          {/* LOGIN */}
-
-          <Link
-            to="/login"
-            className="login-link"
-          >
-
-            <UserRound size={18} />
-
-            <span>
-              Login
-            </span>
-
-          </Link>
-
+          {user && (
+            <button type="button" className="header-logout-btn" onClick={handleLogout} title="Logout">
+              <LogOut size={16} /> <span>Logout</span>
+            </button>
+          )}
         </div>
-
-
-        {/* =================================================
-            MOBILE MENU BUTTON
-        ================================================= */}
 
         <button
           type="button"
           className="mobile-menu-btn"
-          onClick={() =>
-            setMobileOpen(
-              !mobileOpen
-            )
-          }
-          aria-label="Toggle navigation"
-          aria-expanded={
-            mobileOpen
-          }
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileOpen}
+          onClick={() => setMobileOpen(value => !value)}
         >
-
-          {mobileOpen ? (
-
-            <X size={23} />
-
-          ) : (
-
-            <Menu size={23} />
-
-          )}
-
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
-
       </div>
-
-
-      {/* =================================================
-          MOBILE NAVIGATION
-      ================================================= */}
-
-      {mobileOpen && (
-
-        <div className="mobile-menu">
-
-
-          {/* BUY PROPERTY */}
-
-          <Link
-            to="/properties"
-            className={
-              `mobile-nav-link ${
-                isBuyPage
-                  ? 'active'
-                  : ''
-              }`
-            }
-            onClick={
-              closeMobileMenu
-            }
-          >
-            Buy Property
-          </Link>
-
-
-          {/* RENT */}
-
-          <Link
-            to="/properties?listing=rent"
-            className={
-              `mobile-nav-link ${
-                isRentPage
-                  ? 'active'
-                  : ''
-              }`
-            }
-            onClick={
-              closeMobileMenu
-            }
-          >
-            Rent
-          </Link>
-
-
-          
-
-
-          {/* SHORTLIST */}
-
-          <Link
-            to="/shortlist"
-            className={
-              `mobile-nav-link ${
-                isShortlistPage
-                  ? 'active'
-                  : ''
-              }`
-            }
-            onClick={
-              closeMobileMenu
-            }
-          >
-
-            <Heart size={18} />
-
-            Shortlist
-
-          </Link>
-
-
-          {/* MY PROPERTIES */}
-
-          <Link
-            to="/dashboard"
-            className={
-              `mobile-nav-link ${
-                isDashboardPage
-                  ? 'active'
-                  : ''
-              }`
-            }
-            onClick={
-              closeMobileMenu
-            }
-          >
-
-            <Building2 size={18} />
-
-            My Properties
-
-          </Link>
-
-
-          {/* LOGIN */}
-
-          <Link
-            to="/login"
-            className="mobile-nav-link"
-            onClick={
-              closeMobileMenu
-            }
-          >
-
-            <UserRound size={18} />
-
-            Login
-
-          </Link>
-
-
-          {/* POST PROPERTY */}
-
-          <Link
-            to="/post-property"
-            className="mobile-post-btn"
-            onClick={
-              closeMobileMenu
-            }
-          >
-
-            <Plus size={18} />
-
-            Post Property
-
-          </Link>
-
-        </div>
-
-      )}
-
     </header>
-
   );
 }

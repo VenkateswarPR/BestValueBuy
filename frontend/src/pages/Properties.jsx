@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import {
   MapPin,
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import { properties, money } from '../data/properties';
+import { getCurrentUser, readUserShortlist, toggleShortlist } from '../utils/demoAuth';
 
 export default function Properties() {
   const [params] = useSearchParams();
@@ -1099,51 +1100,108 @@ function FilterChip({
    PROPERTY CARD
 ========================================================= */
 
-function PropertyCard({
-  property
-}) {
+
+function PropertyCard({ property }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isSaved, setIsSaved] = useState(() =>
+    readUserShortlist(getCurrentUser()).includes(String(property.id))
+  );
+
+  useEffect(() => {
+    const refreshSavedState = () => {
+      const user = getCurrentUser();
+      setIsSaved(readUserShortlist(user).includes(String(property.id)));
+    };
+
+    refreshSavedState();
+    window.addEventListener('bvb-auth-change', refreshSavedState);
+    window.addEventListener('bvb-shortlist-change', refreshSavedState);
+    window.addEventListener('storage', refreshSavedState);
+
+    return () => {
+      window.removeEventListener('bvb-auth-change', refreshSavedState);
+      window.removeEventListener('bvb-shortlist-change', refreshSavedState);
+      window.removeEventListener('storage', refreshSavedState);
+    };
+  }, [property.id]);
+
   const isRent =
-    property.purpose === 'Rent';
+    String(property.purpose || 'Sale').toLowerCase() === 'rent';
 
   const image =
     property.image ||
-    property.images?.[0];
+    (typeof property.images?.[0] === 'string'
+      ? property.images[0]
+      : property.images?.[0]?.dataUrl) ||
+    '';
+
+  const area = Number(
+    property.area ||
+    property.builtUpArea ||
+    property.plotArea ||
+    0
+  );
+
+  const beds = Number(
+    property.beds ??
+    property.bedrooms ??
+    0
+  );
+
+  const baths = Number(
+    property.baths ??
+    property.bathrooms ??
+    0
+  );
+
+  const listedBy = property.listedBy || 'Owner';
+  const hasSpecs = area > 0 || beds > 0 || baths > 0;
+
+  const handleShortlist = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!getCurrentUser()) {
+      navigate('/login', {
+        state: {
+          from: `${location.pathname}${location.search}`
+        }
+      });
+      return;
+    }
+
+    const result = toggleShortlist(property.id);
+
+    if (result.requiresLogin) {
+      navigate('/login', {
+        state: {
+          from: `${location.pathname}${location.search}`
+        }
+      });
+      return;
+    }
+
+    setIsSaved(result.isSaved);
+  };
 
   return (
-
     <Link
       to={`/properties/${property.id}`}
       className="search-property-card"
     >
-
-      {/* IMAGE */}
-
       <div className="search-card-image">
-
         {image ? (
-
-          <img
-            src={image}
-            alt={property.title}
-          />
-
+          <img src={image} alt={property.title || 'Property'} />
         ) : (
-
           <div className="search-card-image-empty">
             No Image
           </div>
-
         )}
 
-
         <span className="search-sale-tag">
-
-          {isRent
-            ? 'For Rent'
-            : 'For Sale'}
-
+          {isRent ? 'For Rent' : 'For Sale'}
         </span>
-
 
         {property.isUserPosted && (
           <span className="search-user-tag">
@@ -1151,114 +1209,60 @@ function PropertyCard({
           </span>
         )}
 
-
         <button
           type="button"
-          className="search-favorite"
-          onClick={(event) =>
-            event.preventDefault()
-          }
-          aria-label="Shortlist property"
+          className={`search-favorite${isSaved ? ' is-saved' : ''}`}
+          onClick={handleShortlist}
+          aria-label={isSaved ? 'Remove from shortlist' : 'Add to shortlist'}
+          aria-pressed={isSaved}
+          title={isSaved ? 'Remove from shortlist' : 'Add to shortlist'}
         >
-
-          <Heart size={19} />
-
+          <Heart size={19} fill={isSaved ? 'currentColor' : 'none'} />
         </button>
-
       </div>
 
-
-      {/* CONTENT */}
-
       <div className="search-card-content">
-
-
-        {/* PRICE */}
-
         <div className="search-card-price">
-
-          {money(property.price)}
-
+          {money(Number(property.price) || 0)}
           {isRent && (
-            <span className="rent-price-label">
-              / month
-            </span>
+            <span className="rent-price-label"> / month</span>
           )}
-
         </div>
 
-
-        {/* TITLE */}
-
-        <h3>
-          {property.title}
-        </h3>
-
-
-        {/* LOCATION */}
+        <h3>{property.title}</h3>
 
         <p className="search-location">
-
           <MapPin size={15} />
-
-          {property.location}
-
+          {property.location ||
+            [property.locality, property.city].filter(Boolean).join(', ') ||
+            'Location not provided'}
         </p>
 
+        {hasSpecs && (
+          <div className="search-card-specs">
+            {area > 0 && (
+              <span>
+                {area.toLocaleString('en-IN')} sq.ft
+              </span>
+            )}
 
-        {/* SPECS */}
+            {beds > 0 && <span>{beds} Beds</span>}
 
-        <div className="search-card-specs">
-
-          {property.area > 0 && (
-            <span>
-              {Number(
-                property.area
-              ).toLocaleString('en-IN')}{' '}
-              sq.ft
-            </span>
-          )}
-
-
-          {property.beds > 0 && (
-            <span>
-              {property.beds} Beds
-            </span>
-          )}
-
-
-          {property.baths > 0 && (
-            <span>
-              {property.baths} Baths
-            </span>
-          )}
-
-        </div>
-
-
-        {/* FOOTER */}
+            {baths > 0 && <span>{baths} Baths</span>}
+          </div>
+        )}
 
         <div className="search-card-footer">
-
-          <span>
-            {property.listedBy}
-          </span>
-
+          <span>{listedBy}</span>
 
           {property.verified && (
             <span className="verified-badge">
-
               <ShieldCheck size={14} />
-
               Verified
-
             </span>
           )}
-
         </div>
-
       </div>
-
     </Link>
   );
 }
