@@ -1,0 +1,24 @@
+/* Login and registration styling. Names are scoped to avoid affecting existing pages. */
+.bvb-auth-page { min-height: calc(100vh - 76px); padding: 42px 18px 64px; display: flex; justify-content: center; align-items: flex-start; background: #f5f8f6; color: #172b23; }
+.bvb-auth-card { width: min(100%, 460px); padding: 32px; background: #fff; border: 1px solid #e0e9e3; border-radius: 18px; box-shadow: 0 12px 36px rgba(25,58,40,.07); }
+.bvb-auth-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 26px; font-size: 21px; font-weight: 800; color: #26332e; }
+.bvb-auth-brand > span:last-child > span { color: #147653; }
+.bvb-auth-logo { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: #147653; color: white; }
+.bvb-auth-card h1 { margin: 0 0 8px; text-align: center; font-size: 29px; line-height: 1.25; letter-spacing: -.7px; }
+.bvb-auth-subtitle { margin: 0 0 24px; text-align: center; color: #718078; font-size: 14px; line-height: 1.6; }
+.bvb-auth-form { display: flex; flex-direction: column; gap: 9px; }
+.bvb-auth-form label { margin-top: 5px; color: #34483d; font-size: 13px; font-weight: 650; }
+.bvb-auth-input-wrap { min-height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid #dce6df; border-radius: 9px; background: #fff; color: #75847b; }
+.bvb-auth-input-wrap:focus-within { border-color: #147653; box-shadow: 0 0 0 3px rgba(20,118,83,.09); }
+.bvb-auth-input-wrap input { width: 100%; min-width: 0; height: 44px; padding: 0; border: 0; outline: 0; background: transparent; color: #172b23; font: inherit; font-size: 14px; }
+.bvb-auth-eye { display: grid; place-items: center; padding: 5px; border: 0; background: transparent; color: #718078; cursor: pointer; }
+.bvb-auth-submit { width: 100%; min-height: 47px; margin-top: 13px; border: 1px solid #147653; border-radius: 9px; background: #147653; color: white; font-size: 14px; font-weight: 750; cursor: pointer; transition: background .2s, transform .2s; }
+.bvb-auth-submit:hover { background: #0f6042; transform: translateY(-1px); }
+.bvb-auth-submit:disabled { opacity: .65; cursor: wait; transform: none; }
+.bvb-auth-error { margin-bottom: 16px; padding: 11px 13px; border: 1px solid #f0cccc; border-radius: 8px; background: #fff5f5; color: #a22e2e; font-size: 13px; line-height: 1.5; }
+.bvb-auth-switch { margin: 22px 0 0; text-align: center; color: #65756b; font-size: 13px; }
+.bvb-auth-switch a, .bvb-shortlist-secondary a { color: #147653; font-weight: 750; text-decoration: none; }
+.bvb-auth-switch a:hover, .bvb-shortlist-secondary a:hover { text-decoration: underline; }
+.bvb-auth-demo-note { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid #edf1ee; color: #87948c; text-align: center; font-size: 11px; line-height: 1.55; }
+.bvb-shortlist-secondary { margin: 20px 0 0 !important; font-size: 13px !important; }
+@media (max-width: 520px) { .bvb-auth-page { padding: 24px 14px 40px; } .bvb-auth-card { padding: 25px 20px; border-radius: 15px; } .bvb-auth-card h1 { font-size: 25px; } }
