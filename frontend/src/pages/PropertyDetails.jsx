@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   Link,
   useNavigate,
-  useParams,
-  useSearchParams
+  useParams
 } from 'react-router-dom';
 
 import {
@@ -27,10 +26,36 @@ import {
 
 import { properties, money } from '../data/properties';
 
+// Display all dates in DD/MM/YYYY format without timezone shifts.
+function formatDate(value) {
+  if (!value) return '';
+
+  const text = String(value).trim();
+  if (!text) return '';
+
+  // Preserve dates that are already in DD/MM/YYYY format.
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(text)) {
+    return text;
+  }
+
+  // Parse date-only ISO strings manually to avoid UTC timezone shifts.
+  const isoMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    return `${isoMatch[3]}/${isoMatch[2]}/${isoMatch[1]}`;
+  }
+
+  const date = new Date(text);
+  if (Number.isNaN(date.getTime())) return text;
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
 export default function PropertyDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [params] = useSearchParams();
 
   const [userProperties, setUserProperties] = useState([]);
   const [activeImage, setActiveImage] = useState(0);
@@ -209,61 +234,43 @@ export default function PropertyDetails() {
      PROPERTY VALUES
   ========================================================= */
 
-  const price =
-    Number(property.price || 0);
+  const validNumber = (value) => {
+    if (value === null || value === undefined || String(value).trim() === '') {
+      return '';
+    }
 
-  const area =
-    property.area ||
-    property.builtUpArea ||
-    property.plotArea ||
-    '';
+    const number = Number(value);
+    return Number.isFinite(number) && number > 0 ? number : '';
+  };
 
-  const builtUpArea =
-    property.builtUpArea ||
-    '';
+  const price = Number(property.price || 0);
+  const builtUpArea = validNumber(property.builtUpArea);
+  const plotArea = validNumber(property.plotArea);
+  const udsValue = validNumber(property.udsValue);
+  const area = validNumber(property.area) || builtUpArea || plotArea;
+  const apartmentName = property.apartmentName || '';
+  const bedrooms = validNumber(property.beds || property.bedrooms);
+  const bathrooms = validNumber(property.baths || property.bathrooms);
+  const propertyAge = property.propertyAge || '';
+  const facing = property.facing || '';
+  const listedBy = property.listedBy || 'Owner';
 
-  const plotArea =
-    property.plotArea ||
-    '';
-
-  const udsValue =
-    property.udsValue ||
-    '';
-
-  const apartmentName =
-    property.apartmentName ||
-    '';
-
-  const bedrooms =
-    property.beds ||
-    property.bedrooms ||
-    '';
-
-  const bathrooms =
-    property.baths ||
-    property.bathrooms ||
-    '';
-
-  const propertyAge =
-    property.propertyAge ||
-    '';
-
-  const facing =
-    property.facing ||
-    '';
-
-  const listedBy =
-    property.listedBy ||
-    'Owner';
+  // Rental-specific fields saved by PostProperty.jsx.
+  const propertyName = property.propertyName || '';
+  const roomType = property.roomType || '';
+  const sharingType = property.sharingType || '';
+  const furnishedType = property.furnishedType || '';
+  const foodAvailable = property.foodAvailable || '';
+  const attachedBathroom = property.attachedBathroom || '';
+  const genderPreference = property.genderPreference || '';
+  const availableFrom = property.availableFrom || '';
+  const currentOccupancy = validNumber(property.currentOccupancy);
+  const totalCapacity = validNumber(property.totalCapacity);
+  const propertyDescription = String(property.description || '').trim();
 
   const location =
     property.location ||
-    [
-      property.locality,
-      property.city
-    ]
-      .filter(Boolean)
-      .join(', ');
+    [property.locality, property.city].filter(Boolean).join(', ');
 
 
   /* =========================================================
@@ -285,134 +292,34 @@ export default function PropertyDetails() {
     (
       isApartment && apartmentName
         ? `${apartmentName} - ${bedrooms || ''} BHK Apartment`
-        : `${propertyType} in ${location}`
+        : `${propertyType || 'Property'}${location ? ` in ${location}` : ''}`
     );
 
 
   /* =========================================================
-     PROPERTY HIGHLIGHTS
+     DISTINCTIVE HIGHLIGHTS
+     Only show standout amenities here. Core specifications stay
+     in Property Information / Property Area to avoid repetition.
   ========================================================= */
 
   const highlights = [];
 
-
-  if (isApartment) {
-
-    if (builtUpArea) {
-      highlights.push({
-        icon: <Ruler size={19} />,
-        label: 'Built-up Area',
-        value: `${Number(builtUpArea).toLocaleString('en-IN')} sq.ft`
-      });
-    }
-
-    if (udsValue) {
-      highlights.push({
-        icon: <Building2 size={19} />,
-        label: 'UDS Value',
-        value: `${Number(udsValue).toLocaleString('en-IN')} sq.ft`
-      });
-    }
-
-    if (bedrooms) {
-      highlights.push({
-        icon: <Home size={19} />,
-        label: 'Bedrooms',
-        value: `${bedrooms} BHK`
-      });
-    }
-
-    if (bathrooms) {
-      highlights.push({
-        icon: <Home size={19} />,
-        label: 'Bathrooms',
-        value: bathrooms
-      });
-    }
-
-    if (propertyAge) {
-      highlights.push({
-        icon: <Clock size={19} />,
-        label: 'Property Age',
-        value: propertyAge
-      });
-    }
-
-    if (facing) {
-      highlights.push({
-        icon: <Compass size={19} />,
-        label: 'Facing',
-        value: facing
-      });
-    }
-
-  } else if (isLand) {
-
-    if (plotArea) {
-      highlights.push({
-        icon: <Ruler size={19} />,
-        label: 'Plot Area',
-        value: `${Number(plotArea).toLocaleString('en-IN')} sq.ft`
-      });
-    }
-
-    if (facing) {
-      highlights.push({
-        icon: <Compass size={19} />,
-        label: 'Facing',
-        value: facing
-      });
-    }
-
-  } else {
-
-    if (builtUpArea) {
-      highlights.push({
-        icon: <Ruler size={19} />,
-        label: 'Built-up Area',
-        value: `${Number(builtUpArea).toLocaleString('en-IN')} sq.ft`
-      });
-    }
-
-    if (plotArea) {
-      highlights.push({
-        icon: <Ruler size={19} />,
-        label: 'Plot Area',
-        value: `${Number(plotArea).toLocaleString('en-IN')} sq.ft`
-      });
-    }
-
-    if (bedrooms) {
-      highlights.push({
-        icon: <Home size={19} />,
-        label: 'Bedrooms',
-        value: `${bedrooms} BHK`
-      });
-    }
-
-    if (bathrooms) {
-      highlights.push({
-        icon: <Home size={19} />,
-        label: 'Bathrooms',
-        value: bathrooms
-      });
-    }
-
-    if (propertyAge) {
-      highlights.push({
-        icon: <Clock size={19} />,
-        label: 'Property Age',
-        value: propertyAge
-      });
-    }
-
-    if (facing) {
-      highlights.push({
-        icon: <Compass size={19} />,
-        label: 'Facing',
-        value: facing
-      });
-    }
+  if (foodAvailable) {
+    highlights.push({ icon: <Home size={19} />, label: 'Food', value: foodAvailable });
+  }
+  if (attachedBathroom) {
+    highlights.push({ icon: <Home size={19} />, label: 'Bathroom', value: attachedBathroom });
+  }
+  if (furnishedType) {
+    highlights.push({ icon: <Building2 size={19} />, label: 'Furnishing', value: furnishedType });
+  }
+  if (genderPreference) {
+    highlights.push({ icon: <User size={19} />, label: 'Suitable for', value: genderPreference });
+  }
+  if (property.amenities && Array.isArray(property.amenities)) {
+    property.amenities.filter(Boolean).forEach((amenity) => {
+      highlights.push({ icon: <ShieldCheck size={19} />, label: 'Amenity', value: amenity });
+    });
   }
 
 
@@ -433,7 +340,7 @@ export default function PropertyDetails() {
 
           <button
             type="button"
-            className="back-button"
+            className="back-button back-to-properties"
             onClick={() => navigate(backTo)}
           >
             <ArrowLeft size={17} />
@@ -494,7 +401,7 @@ export default function PropertyDetails() {
               <MapPin size={17} />
 
               <span>
-                {location}
+                {location || 'Location not provided'}
               </span>
 
             </div>
@@ -668,190 +575,140 @@ export default function PropertyDetails() {
               </div>
 
 
-              {/* APARTMENT NAME */}
-
-              {isApartment && apartmentName && (
-
-                <div className="apartment-name-box">
-
-                  <Building2 size={20} />
-
-                  <div>
-
-                    <span>
-                      Apartment Name
-                    </span>
-
-                    <strong>
-                      {apartmentName}
-                    </strong>
-
-                  </div>
-
-                </div>
-
-              )}
-
-
               <div className="property-overview-grid">
+                <OverviewItem
+                  icon={<Home size={20} />}
+                  label="Property Type"
+                  value={propertyType || 'Not specified'}
+                />
 
+                <OverviewItem
+                  icon={<IndianRupee size={20} />}
+                  label={isRent ? 'Monthly Rent' : 'Expected Price'}
+                  value={formattedPrice + (isRent ? ' / month' : '')}
+                />
 
-                {/* APARTMENT */}
-
-                {isApartment && (
-                  <>
-
-                    {builtUpArea && (
-                      <OverviewItem
-                        icon={<Ruler size={20} />}
-                        label="Built-up Area"
-                        value={`${Number(builtUpArea).toLocaleString('en-IN')} sq.ft`}
-                      />
-                    )}
-
-                    {udsValue && (
-                      <OverviewItem
-                        icon={<Building2 size={20} />}
-                        label="UDS Value"
-                        value={`${Number(udsValue).toLocaleString('en-IN')} sq.ft`}
-                      />
-                    )}
-
-                    {bedrooms && (
-                      <OverviewItem
-                        icon={<Home size={20} />}
-                        label="Bedrooms"
-                        value={`${bedrooms} BHK`}
-                      />
-                    )}
-
-                    {bathrooms && (
-                      <OverviewItem
-                        icon={<Home size={20} />}
-                        label="Bathrooms"
-                        value={bathrooms}
-                      />
-                    )}
-
-                    {propertyAge && (
-                      <OverviewItem
-                        icon={<Clock size={20} />}
-                        label="Property Age"
-                        value={propertyAge}
-                      />
-                    )}
-
-                    {facing && (
-                      <OverviewItem
-                        icon={<Compass size={20} />}
-                        label="Facing"
-                        value={facing}
-                      />
-                    )}
-
-                    <OverviewItem
-                      icon={<User size={20} />}
-                      label="Listed By"
-                      value={listedBy}
-                    />
-
-                  </>
+                {location && (
+                  <OverviewItem
+                    icon={<MapPin size={20} />}
+                    label="Location"
+                    value={location}
+                  />
                 )}
 
-
-                {/* LAND */}
-
-                {isLand && (
-                  <>
-
-                    {plotArea && (
-                      <OverviewItem
-                        icon={<Ruler size={20} />}
-                        label="Plot Area"
-                        value={`${Number(plotArea).toLocaleString('en-IN')} sq.ft`}
-                      />
-                    )}
-
-                    {facing && (
-                      <OverviewItem
-                        icon={<Compass size={20} />}
-                        label="Facing"
-                        value={facing}
-                      />
-                    )}
-
-                    <OverviewItem
-                      icon={<User size={20} />}
-                      label="Listed By"
-                      value={listedBy}
-                    />
-
-                  </>
+                {isApartment && apartmentName && (
+                  <OverviewItem
+                    icon={<Building2 size={20} />}
+                    label="Apartment Name"
+                    value={apartmentName}
+                  />
                 )}
 
-
-                {/* HOUSE / VILLA */}
-
-                {!isApartment && !isLand && (
-                  <>
-
-                    {builtUpArea && (
-                      <OverviewItem
-                        icon={<Ruler size={20} />}
-                        label="Built-up Area"
-                        value={`${Number(builtUpArea).toLocaleString('en-IN')} sq.ft`}
-                      />
-                    )}
-
-                    {plotArea && (
-                      <OverviewItem
-                        icon={<Ruler size={20} />}
-                        label="Plot Area"
-                        value={`${Number(plotArea).toLocaleString('en-IN')} sq.ft`}
-                      />
-                    )}
-
-                    {bedrooms && (
-                      <OverviewItem
-                        icon={<Home size={20} />}
-                        label="Bedrooms"
-                        value={`${bedrooms} BHK`}
-                      />
-                    )}
-
-                    {bathrooms && (
-                      <OverviewItem
-                        icon={<Home size={20} />}
-                        label="Bathrooms"
-                        value={bathrooms}
-                      />
-                    )}
-
-                    {propertyAge && (
-                      <OverviewItem
-                        icon={<Clock size={20} />}
-                        label="Property Age"
-                        value={propertyAge}
-                      />
-                    )}
-
-                    {facing && (
-                      <OverviewItem
-                        icon={<Compass size={20} />}
-                        label="Facing"
-                        value={facing}
-                      />
-                    )}
-
-                    <OverviewItem
-                      icon={<User size={20} />}
-                      label="Listed By"
-                      value={listedBy}
-                    />
-
-                  </>
+                {builtUpArea && (
+                  <OverviewItem
+                    icon={<Ruler size={20} />}
+                    label="Built-up Area"
+                    value={`${Number(builtUpArea).toLocaleString('en-IN')} sq.ft`}
+                  />
                 )}
 
+                {plotArea && (
+                  <OverviewItem
+                    icon={<Ruler size={20} />}
+                    label="Plot Area"
+                    value={`${Number(plotArea).toLocaleString('en-IN')} sq.ft`}
+                  />
+                )}
+
+                {udsValue && (
+                  <OverviewItem
+                    icon={<Building2 size={20} />}
+                    label="UDS Value"
+                    value={`${Number(udsValue).toLocaleString('en-IN')} sq.ft`}
+                  />
+                )}
+
+                {bedrooms && (
+                  <OverviewItem
+                    icon={<Home size={20} />}
+                    label={propertyType.toLowerCase().includes('pg') || propertyType.toLowerCase().includes('hostel') ? 'Rooms / Bedrooms' : 'Bedrooms'}
+                    value={`${bedrooms}${isApartment || isHouse || isVilla ? ' BHK' : ''}`}
+                  />
+                )}
+
+                {bathrooms && (
+                  <OverviewItem
+                    icon={<Home size={20} />}
+                    label="Bathrooms"
+                    value={bathrooms}
+                  />
+                )}
+
+                {propertyAge && (
+                  <OverviewItem
+                    icon={<Clock size={20} />}
+                    label="Property Age"
+                    value={propertyAge}
+                  />
+                )}
+
+                {facing && (
+                  <OverviewItem
+                    icon={<Compass size={20} />}
+                    label="Facing"
+                    value={facing}
+                  />
+                )}
+
+                {propertyName && (
+                  <OverviewItem
+                    icon={<Building2 size={20} />}
+                    label="PG / Hostel Name"
+                    value={propertyName}
+                  />
+                )}
+
+                {roomType && (
+                  <OverviewItem icon={<Home size={20} />} label="Room Type" value={roomType} />
+                )}
+
+                {sharingType && (
+                  <OverviewItem icon={<User size={20} />} label="Sharing Type" value={sharingType} />
+                )}
+
+                {currentOccupancy !== '' && (
+                  <OverviewItem icon={<User size={20} />} label="Current Occupancy" value={currentOccupancy} />
+                )}
+
+                {totalCapacity !== '' && (
+                  <OverviewItem icon={<User size={20} />} label="Total Capacity" value={totalCapacity} />
+                )}
+
+                {furnishedType && (
+                  <OverviewItem icon={<Home size={20} />} label="Furnishing" value={furnishedType} />
+                )}
+
+                {foodAvailable && (
+                  <OverviewItem icon={<Home size={20} />} label="Food Available" value={foodAvailable} />
+                )}
+
+                {attachedBathroom && (
+                  <OverviewItem icon={<Home size={20} />} label="Attached Bathroom" value={attachedBathroom} />
+                )}
+
+                {genderPreference && (
+                  <OverviewItem icon={<User size={20} />} label="Gender Preference" value={genderPreference} />
+                )}
+
+                {availableFrom && (
+                  <OverviewItem icon={<Calendar size={20} />} label="Available From" value={formatDate(availableFrom)} />
+                )}
+
+                <OverviewItem
+                  icon={<User size={20} />}
+                  label="Listed By"
+                  value={listedBy}
+                />
               </div>
 
             </section>
@@ -861,164 +718,63 @@ export default function PropertyDetails() {
                 AREA DETAILS
             =============================================== */}
 
-            <section className="details-card">
-
-              <div className="details-card-heading">
-
-                <div>
-
-                  <span className="details-eyebrow">
-                    AREA DETAILS
-                  </span>
-
-                  <h2>
-                    Property area
-                  </h2>
-
+            {(builtUpArea || plotArea || udsValue || area || isApartment || isHouse || isVilla || isLand) && (
+              <section className="details-card">
+                <div className="details-card-heading">
+                  <div>
+                    <span className="details-eyebrow">AREA DETAILS</span>
+                    <h2>Property area</h2>
+                  </div>
                 </div>
-
-              </div>
-
-
-              {isApartment && (
 
                 <div className="area-detail-box">
+                  {builtUpArea && (
+                    <div className="area-detail-row">
+                      <span>Built-up Area</span>
+                      <strong>{Number(builtUpArea).toLocaleString('en-IN')} sq.ft</strong>
+                    </div>
+                  )}
 
-                  <div className="area-detail-row">
+                  {plotArea && (
+                    <div className="area-detail-row">
+                      <span>Plot Area</span>
+                      <strong>{Number(plotArea).toLocaleString('en-IN')} sq.ft</strong>
+                    </div>
+                  )}
 
-                    <span>
-                      Built-up Area
-                    </span>
+                  {udsValue && (
+                    <div className="area-detail-row">
+                      <span>UDS Value</span>
+                      <strong>{Number(udsValue).toLocaleString('en-IN')} sq.ft</strong>
+                    </div>
+                  )}
 
-                    <strong>
-                      {builtUpArea
-                        ? `${Number(builtUpArea).toLocaleString('en-IN')} sq.ft`
-                        : 'Not provided'}
-                    </strong>
+                  {!builtUpArea && !plotArea && !udsValue && area && (
+                    <div className="area-detail-row">
+                      <span>{isLand ? 'Plot Area' : 'Property Area'}</span>
+                      <strong>{Number(area).toLocaleString('en-IN')} sq.ft</strong>
+                    </div>
+                  )}
 
-                  </div>
+                  {!builtUpArea && !plotArea && !udsValue && !area && (
+                    <p className="area-description">Area details have not been provided for this property.</p>
+                  )}
 
-
-                  <div className="area-detail-row">
-
-                    <span>
-                      UDS Value
-                    </span>
-
-                    <strong>
-                      {udsValue
-                        ? `${Number(udsValue).toLocaleString('en-IN')} sq.ft`
-                        : 'Not provided'}
-                    </strong>
-
-                  </div>
-
-
-                  <p className="area-description">
-
-                    Built-up Area represents the
-                    constructed / covered area of
-                    the apartment. UDS Value represents
-                    the undivided share of land associated
-                    with the apartment.
-
-                  </p>
-
+                  {(isApartment || isHouse || isVilla) && (
+                    <p className="area-description">
+                      Built-up Area is the constructed or covered area. Plot Area is the total land area on which the property is situated. UDS Value is the undivided share of land associated with an apartment.
+                    </p>
+                  )}
                 </div>
-
-              )}
-
-
-              {(isHouse || isVilla) && (
-
-                <div className="area-detail-box">
-
-                  <div className="area-detail-row">
-
-                    <span>
-                      Built-up Area
-                    </span>
-
-                    <strong>
-                      {builtUpArea
-                        ? `${Number(builtUpArea).toLocaleString('en-IN')} sq.ft`
-                        : 'Not provided'}
-                    </strong>
-
-                  </div>
-
-
-                  <div className="area-detail-row">
-
-                    <span>
-                      Plot Area
-                    </span>
-
-                    <strong>
-                      {plotArea
-                        ? `${Number(plotArea).toLocaleString('en-IN')} sq.ft`
-                        : 'Not provided'}
-                    </strong>
-
-                  </div>
-
-
-                  <p className="area-description">
-
-                    Built-up Area represents the
-                    constructed / covered area of
-                    the building, while Plot Area
-                    represents the total land area
-                    on which the property is situated.
-
-                  </p>
-
-                </div>
-
-              )}
-
-
-              {isLand && (
-
-                <div className="area-detail-box">
-
-                  <div className="area-detail-row">
-
-                    <span>
-                      Plot Area
-                    </span>
-
-                    <strong>
-                      {plotArea
-                        ? `${Number(plotArea).toLocaleString('en-IN')} sq.ft`
-                        : 'Not provided'}
-                    </strong>
-
-                  </div>
-
-
-                  <p className="area-description">
-
-                    Plot Area represents the total
-                    land area available for this
-                    property.
-
-                  </p>
-
-                </div>
-
-              )}
-
-            </section>
+              </section>
+            )}
 
 
             {/* ===============================================
                 DESCRIPTION
             =============================================== */}
 
-            {property.description && (
-
-              <section className="details-card">
+            <section className="details-card">
 
                 <div className="details-card-heading">
 
@@ -1038,12 +794,10 @@ export default function PropertyDetails() {
 
 
                 <p className="property-description">
-                  {property.description}
+                  {propertyDescription || 'No description has been provided for this property.'}
                 </p>
 
               </section>
-
-            )}
 
 
             {/* ===============================================
@@ -1059,11 +813,11 @@ export default function PropertyDetails() {
                   <div>
 
                     <span className="details-eyebrow">
-                      KEY FEATURES
+                      WHAT MAKES IT SPECIAL
                     </span>
 
                     <h2>
-                      Property highlights
+                      Highlights & amenities
                     </h2>
 
                   </div>
@@ -1144,7 +898,13 @@ export default function PropertyDetails() {
 
 
               <a
-                href="tel:+919999999999"
+                href={property.phone || property.contactPhone ? `tel:${property.phone || property.contactPhone}` : '#contact-owner'}
+                onClick={(event) => {
+                  if (!(property.phone || property.contactPhone)) {
+                    event.preventDefault();
+                    alert('Owner contact details have not been provided for this listing.');
+                  }
+                }}
                 className="contact-primary-btn"
               >
 
@@ -1158,7 +918,13 @@ export default function PropertyDetails() {
 
 
               <a
-                href="tel:+919999999999"
+                href={property.phone || property.contactPhone ? `tel:${property.phone || property.contactPhone}` : '#enquiry'}
+                onClick={(event) => {
+                  if (!(property.phone || property.contactPhone)) {
+                    event.preventDefault();
+                    alert('Owner contact details will be available when this feature is connected.');
+                  }
+                }}
                 className="contact-secondary-btn"
               >
 
@@ -1193,11 +959,22 @@ export default function PropertyDetails() {
               <button
                 type="button"
                 className="contact-secondary-btn"
-                onClick={() =>
-                  alert(
-                    'Property added to shortlist.'
-                  )
-                }
+                onClick={() => {
+                  try {
+                    const key = 'bestValueBuyShortlist';
+                    const saved = JSON.parse(localStorage.getItem(key) || '[]');
+                    const ids = Array.isArray(saved) ? saved : [];
+                    const alreadySaved = ids.some((item) => String(item?.id ?? item) === String(property.id));
+                    if (!alreadySaved) {
+                      ids.push(property);
+                      localStorage.setItem(key, JSON.stringify(ids));
+                    }
+                    alert(alreadySaved ? 'This property is already in your shortlist.' : 'Property added to shortlist.');
+                  } catch (error) {
+                    console.error('Unable to update shortlist:', error);
+                    alert('Unable to update shortlist. Please try again.');
+                  }
+                }}
               >
 
                 <Heart size={17} />

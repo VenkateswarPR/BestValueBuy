@@ -1,0 +1,30 @@
+/* Sold / Rented status design for My Properties */
+.dashboard-summary-grid-status { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.dashboard-summary-card.summary-sold .dashboard-summary-icon { color: #a63d3d; background: #fff0f0; }
+.dashboard-summary-card.summary-rented .dashboard-summary-icon { color: #95600a; background: #fff5df; }
+.dashboard-list-header-status { gap: 18px; flex-wrap: wrap; }
+.dashboard-status-filter { display: flex; flex-wrap: wrap; gap: 7px; }
+.dashboard-status-filter button { border: 1px solid #dce3eb; border-radius: 999px; padding: 8px 13px; color: #526174; background: #fff; font: inherit; font-size: 12px; font-weight: 650; cursor: pointer; transition: .18s ease; }
+.dashboard-status-filter button:hover, .dashboard-status-filter button.selected { background: #eaf7f4; border-color: #8acfc3; color: #087f75; }
+.dashboard-property-card-closed { border-color: #e3e6eb; }
+.dashboard-property-image-closed img { filter: grayscale(.7) brightness(.72); }
+.dashboard-closed-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.dashboard-closed-overlay span { transform: rotate(-12deg); padding: 9px 22px; border: 2px solid rgba(255,255,255,.95); border-radius: 5px; color: #fff; font-size: 22px; font-weight: 850; letter-spacing: 3px; text-shadow: 0 2px 8px rgba(0,0,0,.3); box-shadow: 0 3px 12px rgba(0,0,0,.12); }
+.dashboard-closed-overlay.sold span { background: rgba(145, 38, 38, .9); }
+.dashboard-closed-overlay.rented span { background: rgba(143, 91, 10, .92); }
+.dashboard-property-image { position: relative; overflow: hidden; }
+.dashboard-property-status-row { display: flex; align-items: center; gap: 9px; margin: 12px 0 2px; }
+.dashboard-status-pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 5px 10px; font-size: 11px; font-weight: 750; }
+.dashboard-status-pill.active { background: #e8f7ee; color: #187647; }
+.dashboard-status-pill.sold { background: #fff0f0; color: #a12d2d; }
+.dashboard-status-pill.rented { background: #fff5df; color: #8b5a06; }
+.dashboard-status-date { color: #8792a2; font-size: 11px; }
+.dashboard-mark-status-btn, .dashboard-reactivate-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid transparent; border-radius: 8px; padding: 8px 11px; font: inherit; font-size: 12px; font-weight: 650; cursor: pointer; transition: .18s ease; }
+.dashboard-mark-status-btn.sold-action { background: #fff0f0; color: #a12d2d; border-color: #f3d0d0; }
+.dashboard-mark-status-btn.sold-action:hover { background: #a12d2d; color: #fff; }
+.dashboard-mark-status-btn.rented-action { background: #fff5df; color: #8b5a06; border-color: #f0dfb5; }
+.dashboard-mark-status-btn.rented-action:hover { background: #8b5a06; color: #fff; }
+.dashboard-reactivate-btn { background: #eaf7f4; color: #087f75; border-color: #b7e1d9; }
+.dashboard-reactivate-btn:hover { background: #087f75; color: #fff; }
+@media (max-width: 1100px) { .dashboard-summary-grid-status { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .dashboard-summary-grid-status { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dashboard-list-header-status { align-items: flex-start; flex-direction: column; } .dashboard-status-filter { width: 100%; } .dashboard-status-filter button { padding: 7px 10px; } }
